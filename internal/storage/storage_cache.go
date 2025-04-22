@@ -18,7 +18,9 @@ type Cache struct {
 	maxSize		int
 }
 
-func NewCache(maxSize int) (c Cache) {
+func NewCache(maxSize int) (c *Cache) {
+	c = &Cache{}
+	
 	c.maxSize = maxSize
 	c.data = list.New()
 	return c
