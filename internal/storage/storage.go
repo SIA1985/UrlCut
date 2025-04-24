@@ -13,11 +13,30 @@ import(
 
 /*Postgres SQL-хранилище*/
 type PConfig struct {
-	host		string		`json:'host'`
-	port		string 		`json:'port'`
+	Host		string		`json:"host"`
+	Port		string 		`json:"port"`
 	user		string
 	password	string 
 	dbname		string	
+}
+
+func (c *PConfig) Init() {
+	var err error
+
+	cngPath := "/home/ilia/Desktop/темки/гоня/UrlCut/configs/postgres.json"
+	
+	var barr []byte
+	if barr, err = os.ReadFile(cngPath); err == nil {
+        if err = json.Unmarshal(barr, c); err != nil {
+            log.Panicln("Ошибка в парсинге конфигурационного файла " + cngPath, err.Error())
+        }
+    } else {
+        log.Panicln("Не удалось открыть конфигурационный файл:", err.Error())
+    }
+
+	c.user = os.Getenv("POSTGRES_USER")
+	c.password = os.Getenv("POSTGRES_PASSWORD")
+	c.dbname = os.Getenv("POSTGRES_DBNAME")
 }
 
 type PSQL struct {
@@ -27,19 +46,19 @@ type PSQL struct {
 
 func (p *PSQL) Init() {
 	var err error
-	var conf PConfig
 
 	p.cache = NewCache(1000)
 
-	/*json config parsing by path fron ENV*/
+	var conf PConfig
+	conf.Init()
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
     "password=%s dbname=%s sslmode=disable",
-    conf.host, conf.port, conf.user, conf.password, conf.dbname)
+    conf.Host, conf.Port, conf.user, conf.password, conf.dbname)
 
 	p.db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln("Не удалось установить соединение с БД Postgres", err.Error())
 	}
 	//todo: defer s.db.Close() -> функция деструктор?
 }
@@ -56,9 +75,9 @@ func (p *PSQL) GetFullUrl(cutUrl string) (fullUrl string, err error) {
 }
 
 func (p *PSQL) StoreCutUrl(cutUrl string, fullUrl string) (err error) {
-	p.cache.Add(cutUrl, fullUrl)
-
 	/*add to sql*/
+
+	p.cache.Add(cutUrl, fullUrl)
 
 	return
 }
