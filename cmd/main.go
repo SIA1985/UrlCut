@@ -7,7 +7,7 @@ import(
 
 func tryStorage(s interfaces.Storage) {
 	s.Init()
-	s.GetFullUrl("test")
+	s.GetFullUrl("aaaaaa")
 }
 
 func main() {

@@ -14,7 +14,7 @@ import(
 /*Postgres SQL-хранилище*/
 type PConfig struct {
 	Host		string		`json:"host"`
-	Port		string 		`json:"port"`
+	Port		int 		`json:"port"`
 	user		string
 	password	string 
 	dbname		string	
@@ -23,6 +23,7 @@ type PConfig struct {
 func (c *PConfig) Init() {
 	var err error
 
+	//todo: переделать
 	cngPath := "/home/ilia/Desktop/темки/гоня/UrlCut/configs/postgres.json"
 	
 	var barr []byte
@@ -36,7 +37,7 @@ func (c *PConfig) Init() {
 
 	c.user = os.Getenv("POSTGRES_USER")
 	c.password = os.Getenv("POSTGRES_PASSWORD")
-	c.dbname = os.Getenv("POSTGRES_DBNAME")
+	c.dbname = "urlcut"
 }
 
 type PSQL struct {
@@ -69,7 +70,21 @@ func (p *PSQL) GetFullUrl(cutUrl string) (fullUrl string, err error) {
 		return
 	}
 
-	/*request sql data*/
+	var rows *sql.Rows
+	//todo: переделать
+	rows, err = p.db.Query(fmt.Sprintf("SELECT fullUrl FROM \"CutToFull\" WHERE cutUrl = '%s'", cutUrl))
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err = rows.Scan(&fullUrl); err != nil {
+			return
+		}
+	}
+
+	//todo: занесение в кэш?
 
 	return
 }
