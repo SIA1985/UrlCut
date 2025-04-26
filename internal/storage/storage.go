@@ -48,7 +48,7 @@ type PSQL struct {
 func (p *PSQL) Init() {
 	var err error
 
-	p.cache = NewCache(1000)
+	p.cache = NewCache(1)
 
 	var conf PConfig
 	conf.Init()
@@ -65,14 +65,14 @@ func (p *PSQL) Init() {
 }
 
 func (p *PSQL) GetFullUrl(cutUrl string) (fullUrl string, err error) {
-	if p.cache.Contains(fullUrl) {
+	if p.cache.Contains(cutUrl) {
 		fullUrl, err = p.cache.Get(cutUrl)
 		return
 	}
 
 	var rows *sql.Rows
-	//todo: переделать
-	rows, err = p.db.Query(fmt.Sprintf("SELECT fullUrl FROM \"CutToFull\" WHERE cutUrl = '%s'", cutUrl))
+	request := fmt.Sprintf("SELECT fullUrl FROM \"CutToFull\" WHERE cutUrl = '%s'", cutUrl)
+	rows, err = p.db.Query(request)
 	if err != nil {
 		return
 	}
@@ -84,13 +84,17 @@ func (p *PSQL) GetFullUrl(cutUrl string) (fullUrl string, err error) {
 		}
 	}
 
-	//todo: занесение в кэш?
+	p.cache.Add(cutUrl, fullUrl)
 
 	return
 }
 
 func (p *PSQL) StoreCutUrl(cutUrl string, fullUrl string) (err error) {
-	/*add to sql*/
+	request := fmt.Sprintf("INSERT INTO \"CutToFull\" (cutUrl, fullUrl) VALUES ('%s', '%s')", cutUrl, fullUrl)
+	_, err = p.db.Query(request)
+	if err != nil {
+		return
+	}
 
 	p.cache.Add(cutUrl, fullUrl)
 
