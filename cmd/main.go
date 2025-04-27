@@ -8,7 +8,6 @@ import(
 )
 
 func tryStorage(s interfaces.Storage) {
-	s.Init()
 	url, _ := s.GetFullUrl("aaaaaa")
 	url2, _ := s.GetFullUrl("aaaaaa")
 
@@ -19,5 +18,9 @@ func tryStorage(s interfaces.Storage) {
 }
 
 func main() {
-	tryStorage(&storage.PSQL{})
+	p, err := storage.NewPSQL(storage.WithCacheSize(5))
+	if err != nil {
+		return
+	}
+	tryStorage(p)
 }

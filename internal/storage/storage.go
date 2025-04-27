@@ -10,9 +10,8 @@ import(
 	"fmt"
 )
 
-
 /*Postgres SQL-хранилище*/
-type PConfig struct {
+type PostgresConfig struct {
 	Host		string		`json:"host"`
 	Port		int 		`json:"port"`
 	user		string
@@ -20,38 +19,45 @@ type PConfig struct {
 	dbname		string	
 }
 
-func (c *PConfig) Init() {
-	var err error
+type PSQLOption func(*PSQL)
 
-	//todo: переделать
-	cngPath := "/home/ilia/Desktop/темки/гоня/UrlCut/configs/postgres.json"
-	
+func WithPostgresCngPath(postgresCngPath string) (PSQLOption) {
+	return func (p *PSQL) {
+		p.postgresCngPath = postgresCngPath
+	}
+}
+
+func WithCacheSize(cacheSize int) (PSQLOption) {
+	return func (p *PSQL) {
+		p.cacheSize = cacheSize
+	}
+}
+
+func NewPSQL(opts... PSQLOption) (p *PSQL, err error) {
+	p = &PSQL{
+		postgresCngPath: 	"/home/ilia/Desktop/темки/гоня/UrlCut/configs/postgres.json",
+		cacheSize:  		1000,
+	}
+	for _, opt := range opts {
+		opt(p)
+	}
+
 	var barr []byte
-	if barr, err = os.ReadFile(cngPath); err == nil {
-        if err = json.Unmarshal(barr, c); err != nil {
-            log.Panicln("Ошибка в парсинге конфигурационного файла " + cngPath, err.Error())
+	var conf PostgresConfig
+	if barr, err = os.ReadFile(p.postgresCngPath); err == nil {
+        if err = json.Unmarshal(barr, &conf); err != nil {
+            log.Println("Ошибка в парсинге конфигурационного файла " + p.postgresCngPath, err.Error())
+			return nil, err
         }
     } else {
-        log.Panicln("Не удалось открыть конфигурационный файл:", err.Error())
+        log.Println("Не удалось открыть конфигурационный файл:", err.Error())
+		return nil, err
     }
 
-	c.user = os.Getenv("POSTGRES_USER")
-	c.password = os.Getenv("POSTGRES_PASSWORD")
-	c.dbname = "urlcut"
-}
+	conf.user = os.Getenv("POSTGRES_USER")
+	conf.password = os.Getenv("POSTGRES_PASSWORD")
+	conf.dbname = "urlcut"
 
-type PSQL struct {
-	cache 		*Cache
-	db			*sql.DB
-}
-
-func (p *PSQL) Init() {
-	var err error
-
-	p.cache = NewCache(1)
-
-	var conf PConfig
-	conf.Init()
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
     "password=%s dbname=%s sslmode=disable",
@@ -60,8 +66,21 @@ func (p *PSQL) Init() {
 	p.db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Fatalln("Не удалось установить соединение с БД Postgres", err.Error())
+		return nil, err
 	}
-	//todo: defer s.db.Close() -> функция деструктор?
+
+	p.cache = NewCache(p.cacheSize)
+
+	return
+}
+
+//Хранить данные конфигурации удобно для отладки или дампа структуры
+type PSQL struct {
+	postgresCngPath		string
+	cacheSize			int
+
+	cache 		*Cache
+	db			*sql.DB
 }
 
 func (p *PSQL) GetFullUrl(cutUrl string) (fullUrl string, err error) {
@@ -99,4 +118,8 @@ func (p *PSQL) StoreCutUrl(cutUrl string, fullUrl string) (err error) {
 	p.cache.Add(cutUrl, fullUrl)
 
 	return
+}
+
+func (p *PSQL) Close() {
+	p.db.Close()
 }
