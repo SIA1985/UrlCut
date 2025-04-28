@@ -7,3 +7,5 @@ type Storage interface {
 	StoreCutUrl(cutUrl string, fullUrl string) (err error)
 	Close()
 }
+
+/*Интерфейс нарезчика ссылок не нужен, ибо незаменяемый объект*/

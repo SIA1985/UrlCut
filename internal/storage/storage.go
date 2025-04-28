@@ -19,7 +19,7 @@ type PostgresConfig struct {
 	dbname		string	
 }
 
-func (c *PostgresConfig) Parse(postgresCngPath string) (err error) {
+func (c *PostgresConfig) ParseAndInit(postgresCngPath string) (err error) {
 	var barr []byte
 	
 	if barr, err = os.ReadFile(postgresCngPath); err == nil {
@@ -63,7 +63,7 @@ func NewPSQL(opts... PSQLOption) (p *PSQL, err error) {
 	}
 
 	var conf PostgresConfig
-	conf.Parse(p.postgresCngPath)
+	conf.ParseAndInit(p.postgresCngPath)
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
     "password=%s dbname=%s sslmode=disable",
