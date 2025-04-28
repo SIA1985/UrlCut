@@ -26,6 +26,7 @@ func WithCutSize(cutSize int) (CutterOption) {
 
 func NewCutter(opts... CutterOption) (c *Cutter, err error) {
 	c = &Cutter{
+		cutSize: 6,
 		cutFunc: func(fullUrl string) (cutUrl string) {
 			h := sha256.New()
 			h.Write([]byte(fullUrl))
