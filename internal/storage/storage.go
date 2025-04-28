@@ -19,6 +19,26 @@ type PostgresConfig struct {
 	dbname		string	
 }
 
+func (c *PostgresConfig) Parse(postgresCngPath string) (err error) {
+	var barr []byte
+	
+	if barr, err = os.ReadFile(postgresCngPath); err == nil {
+        if err = json.Unmarshal(barr, c); err != nil {
+            log.Println("Ошибка в парсинге конфигурационного файла " + postgresCngPath, err.Error())
+			return 
+        }
+    } else {
+        log.Println("Не удалось открыть конфигурационный файл:", err.Error())
+		return 
+    }
+
+	c.user = os.Getenv("POSTGRES_USER")
+	c.password = os.Getenv("POSTGRES_PASSWORD")
+	c.dbname = "urlcut"
+
+	return
+}
+
 type PSQLOption func(*PSQL)
 
 func WithPostgresCngPath(postgresCngPath string) (PSQLOption) {
@@ -42,22 +62,8 @@ func NewPSQL(opts... PSQLOption) (p *PSQL, err error) {
 		opt(p)
 	}
 
-	var barr []byte
 	var conf PostgresConfig
-	if barr, err = os.ReadFile(p.postgresCngPath); err == nil {
-        if err = json.Unmarshal(barr, &conf); err != nil {
-            log.Println("Ошибка в парсинге конфигурационного файла " + p.postgresCngPath, err.Error())
-			return nil, err
-        }
-    } else {
-        log.Println("Не удалось открыть конфигурационный файл:", err.Error())
-		return nil, err
-    }
-
-	conf.user = os.Getenv("POSTGRES_USER")
-	conf.password = os.Getenv("POSTGRES_PASSWORD")
-	conf.dbname = "urlcut"
-
+	conf.Parse(p.postgresCngPath)
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
     "password=%s dbname=%s sslmode=disable",
