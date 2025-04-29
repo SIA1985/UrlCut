@@ -4,6 +4,7 @@ import(
 	"UrlCut/internal/storage"
 	"UrlCut/internal/interfaces"
 	"UrlCut/internal/cutter"
+	"UrlCut/internal/logic"
 
 	"fmt"
 )
@@ -18,6 +19,23 @@ func tryStorage(s interfaces.Storage) {
 	}
 
 	s.Close()
+}
+
+func tryLogic(l *logic.Logic) {
+	var err error
+
+	var cutUrl string
+	cutUrl, err = l.CutUrl("www.yandex.ru")
+	if err != nil {
+		return
+	}
+
+	err = l.Redirect(cutUrl)
+	if err != nil {
+		return
+	}
+
+	fmt.Println("Logic ok")
 }
 
 func tryCutter(c *cutter.Cutter) {
@@ -37,9 +55,17 @@ func main() {
 
 
 	var c *cutter.Cutter
-	c, err = cutter.NewCutter(	cutter.WithCutSize(6) )
+	c, err = cutter.NewCutter(6)
 	if err != nil {
 		return
 	}
 	tryCutter(c)
+
+	var l *logic.Logic
+	l, err = logic.NewLogic(	logic.WithStorage(p),
+								logic.WithCutter(c) )
+	if err != nil {
+		return 
+	}
+	tryLogic(l)
 }

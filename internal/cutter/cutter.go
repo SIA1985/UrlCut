@@ -1,7 +1,8 @@
 package cutter
 
 import (
-	"crypto/sha256"
+	"crypto/md5"
+	"encoding/hex"
 )
 
 
@@ -9,30 +10,18 @@ type Cutter struct {
 	cutSize			int
 }
 
-type CutterOption func(*Cutter)
-
-func WithCutSize(cutSize int) (CutterOption) {
-	return func(c *Cutter) {
-		c.cutSize = cutSize
-	}
-}
-
-func NewCutter(opts... CutterOption) (c *Cutter, err error) {
+func NewCutter(cutSize int) (c *Cutter, err error) {
 	c = &Cutter{
-		cutSize: 6,
-	}
-
-	for _, opt := range opts {
-		opt(c)
+		cutSize: cutSize,
 	}
 
 	return
 }
 
 func (c *Cutter) Cut(fullUrl string) (cutUrl string) {
-	h := sha256.New()
+	h := md5.New()
 	h.Write([]byte(fullUrl))
   
-	cutUrl = string(h.Sum(nil))[:c.cutSize]
+	cutUrl = hex.EncodeToString(h.Sum(nil))[:c.cutSize]
 	return 
 }
