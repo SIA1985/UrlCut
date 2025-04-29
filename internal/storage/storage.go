@@ -103,6 +103,7 @@ func (p *PSQL) GetFullUrl(cutUrl string) (fullUrl string, err error) {
 	}
 	defer rows.Close()
 
+	/*если более 1, то коллизия*/
 	for rows.Next() {
 		if err = rows.Scan(&fullUrl); err != nil {
 			return
