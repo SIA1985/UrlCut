@@ -1,4 +1,4 @@
-package ui
+package server
 
 import "UrlCut/internal/logic"
 
@@ -6,6 +6,6 @@ type Terminal struct {
 	logic *logic.Logic
 }
 
-func (h *Terminal) Exec() {
+func (h *Terminal) Listen() {
 
 }

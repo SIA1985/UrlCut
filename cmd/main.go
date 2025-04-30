@@ -4,8 +4,8 @@ import (
 	"UrlCut/internal/cutter"
 	"UrlCut/internal/interfaces"
 	"UrlCut/internal/logic"
+	"UrlCut/internal/server"
 	"UrlCut/internal/storage"
-	"UrlCut/internal/ui"
 
 	"fmt"
 )
@@ -69,11 +69,11 @@ func main() {
 	}
 	tryLogic(l)
 
-	var u interfaces.UI
-	u, err = ui.NewHTTP(l)
+	var s interfaces.UI
+	s, err = server.NewHTTP(l)
 	if err != nil {
 		return
 	}
 
-	u.Exec()
+	s.Exec()
 }
