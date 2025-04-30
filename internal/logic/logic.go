@@ -1,76 +1,74 @@
 package logic
 
-
-import(
-	"UrlCut/internal/interfaces"
+import (
 	"UrlCut/internal/cutter"
+	"UrlCut/internal/interfaces"
 	"UrlCut/internal/storage"
+	"fmt"
 	"os/exec"
 	"runtime"
-	"fmt"
 )
 
-func openBrowser(fullUrl string) (err error){
+func openBrowser(fullUrl string) (err error) {
 	switch os := runtime.GOOS; os {
 	case "linux":
-	  err = exec.Command("x-www-browser", fullUrl).Start()
+		err = exec.Command("x-www-browser", fullUrl).Start()
 	case "windows":
-	  err = exec.Command("rundll32", "url.dll,FileProtocolHandler", fullUrl).Start()
+		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", fullUrl).Start()
 	case "darwin":
-	  err = exec.Command("open", fullUrl).Start()
+		err = exec.Command("open", fullUrl).Start()
 	default:
-	  err = fmt.Errorf("Не поддерживаемая платформа!")
+		err = fmt.Errorf("Не поддерживаемая платформа!")
 	}
 
 	return
-  }
+}
 
 type Logic struct {
-	storage 		interfaces.Storage
-	cutter			*cutter.Cutter
+	storage interfaces.Storage
+	cutter  *cutter.Cutter
 
-	redirectFunc	func(fullUrl string)(err error)
+	redirectFunc func(fullUrl string) (err error)
 }
 
 type LogicOption func(*Logic)
 
-func WithStorage(storage interfaces.Storage) (LogicOption) {
+func WithStorage(storage interfaces.Storage) LogicOption {
 	return func(l *Logic) {
 		l.storage = storage
 	}
 }
 
-func WithCutter(cutter	*cutter.Cutter) (LogicOption) {
+func WithCutter(cutter *cutter.Cutter) LogicOption {
 	return func(l *Logic) {
 		l.cutter = cutter
 	}
 }
 
-func WithRedirectFunc(redirectFunc func(fullUrl string)(err error)) (LogicOption) {
+func WithRedirectFunc(redirectFunc func(fullUrl string) (err error)) LogicOption {
 	return func(l *Logic) {
 		l.redirectFunc = redirectFunc
 	}
 }
 
-func NewLogic(opts... LogicOption) (l *Logic, err error) {
+func NewLogic(opts ...LogicOption) (l *Logic, err error) {
 	var p *storage.PSQL
 	p, err = storage.NewPSQL()
 	if err != nil {
-		return 
+		return
 	}
 
 	var c *cutter.Cutter
 	c, err = cutter.NewCutter(6)
 	if err != nil {
-		return 
+		return
 	}
-	
+
 	l = &Logic{
 		storage: p,
-		cutter: c,
+		cutter:  c,
 
 		redirectFunc: openBrowser,
-
 	}
 
 	for _, opt := range opts {
@@ -85,22 +83,22 @@ func (l *Logic) CutUrl(fullUrl string) (cutUrl string, err error) {
 
 	err = l.storage.StoreCutUrl(cutUrl, fullUrl)
 	if err != nil {
-		return 
+		return
 	}
 
-	return 
+	return
 }
 
 func (l *Logic) Redirect(cutUrl string) (err error) {
 	var fullUrl string
 	fullUrl, err = l.storage.GetFullUrl(cutUrl)
 	if err != nil {
-		return 
+		return
 	}
 
 	err = l.redirectFunc(fullUrl)
 	if err != nil {
-		return 
+		return
 	}
 
 	return

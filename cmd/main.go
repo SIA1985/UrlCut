@@ -1,10 +1,11 @@
 package main
 
-import(
-	"UrlCut/internal/storage"
-	"UrlCut/internal/interfaces"
+import (
 	"UrlCut/internal/cutter"
+	"UrlCut/internal/interfaces"
 	"UrlCut/internal/logic"
+	"UrlCut/internal/storage"
+	"UrlCut/internal/ui"
 
 	"fmt"
 )
@@ -46,13 +47,12 @@ func main() {
 	var err error
 
 	var p *storage.PSQL
-	p, err = storage.NewPSQL(	storage.WithCacheSize(5), 
-								storage.WithPostgresCngPath("/home/ilia/Desktop/темки/гоня/UrlCut/configs/postgres.json") )
+	p, err = storage.NewPSQL(storage.WithCacheSize(5),
+		storage.WithPostgresCngPath("/home/ilia/Desktop/темки/гоня/UrlCut/configs/postgres.json"))
 	if err != nil {
 		return
 	}
 	tryStorage(p)
-
 
 	var c *cutter.Cutter
 	c, err = cutter.NewCutter(6)
@@ -62,10 +62,18 @@ func main() {
 	tryCutter(c)
 
 	var l *logic.Logic
-	l, err = logic.NewLogic(	logic.WithStorage(p),
-								logic.WithCutter(c) )
+	l, err = logic.NewLogic(logic.WithStorage(p),
+		logic.WithCutter(c))
 	if err != nil {
-		return 
+		return
 	}
 	tryLogic(l)
+
+	var u interfaces.UI
+	u, err = ui.NewHTTP(l)
+	if err != nil {
+		return
+	}
+
+	u.Exec()
 }

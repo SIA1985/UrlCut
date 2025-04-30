@@ -1,6 +1,5 @@
 package interfaces
 
-
 /*Запись и чтение из хранилища*/
 type Storage interface {
 	GetFullUrl(cutUrl string) (fullUrl string, err error)
@@ -8,4 +7,7 @@ type Storage interface {
 	Close()
 }
 
-/*Интерфейс нарезчика ссылок не нужен, ибо незаменяемый объект*/
+/*Обработка событий пользователя*/
+type UI interface {
+	Exec()
+}
