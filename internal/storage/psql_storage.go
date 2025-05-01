@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 )
 
@@ -22,11 +21,9 @@ func (c *PostgresConfig) ParseAndInit(postgresCngPath string) (err error) {
 
 	if barr, err = os.ReadFile(postgresCngPath); err == nil {
 		if err = json.Unmarshal(barr, c); err != nil {
-			log.Println("Ошибка в парсинге конфигурационного файла "+postgresCngPath, err.Error())
 			return
 		}
 	} else {
-		log.Println("Не удалось открыть конфигурационный файл:", err.Error())
 		return
 	}
 

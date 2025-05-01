@@ -8,6 +8,6 @@ type Storage interface {
 }
 
 /*Обработка событий пользователя*/
-type UI interface {
-	Exec()
+type Server interface {
+	Listen()
 }

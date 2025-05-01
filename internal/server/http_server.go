@@ -6,6 +6,6 @@ type HTTP struct {
 	logic *logic.Logic
 }
 
-func (h *HTTP) Server() {
+func (h *HTTP) Listen() {
 
 }

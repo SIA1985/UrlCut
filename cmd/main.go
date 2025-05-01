@@ -6,6 +6,7 @@ import (
 	"UrlCut/internal/logic"
 	"UrlCut/internal/server"
 	"UrlCut/internal/storage"
+	"log"
 
 	"fmt"
 )
@@ -48,8 +49,9 @@ func main() {
 
 	var p *storage.PSQL
 	p, err = storage.NewPSQL(storage.WithCacheSize(5),
-		storage.WithPostgresCngPath("/home/ilia/Desktop/темки/гоня/UrlCut/configs/postgres.json"))
+		storage.WithPostgresCngPath("/home/ilia/Desktop/temki/gonya/UrlCut/configs/postgres.json"))
 	if err != nil {
+		log.Fatalf("Ошибка в создании объекта storage: %v", err)
 		return
 	}
 	tryStorage(p)
@@ -57,6 +59,7 @@ func main() {
 	var c *cutter.Cutter
 	c, err = cutter.NewCutter(6)
 	if err != nil {
+		log.Fatalf("Ошибка в создании объекта cutter: %v", err)
 		return
 	}
 	tryCutter(c)
@@ -65,15 +68,17 @@ func main() {
 	l, err = logic.NewLogic(logic.WithStorage(p),
 		logic.WithCutter(c))
 	if err != nil {
+		log.Fatalf("Ошибка в создании объекта logic: %v", err)
 		return
 	}
 	tryLogic(l)
 
-	var s interfaces.UI
+	var s interfaces.Server
 	s, err = server.NewHTTP(l)
 	if err != nil {
+		log.Fatalf("Ошибка в создании объекта server: %v", err)
 		return
 	}
 
-	s.Exec()
+	s.Listen()
 }

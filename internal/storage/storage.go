@@ -3,7 +3,6 @@ package storage
 import (
 	"database/sql"
 	"fmt"
-	"log"
 
 	_ "github.com/lib/pq"
 )
@@ -24,7 +23,7 @@ func WithCacheSize(cacheSize int) PSQLOption {
 
 func NewPSQL(opts ...PSQLOption) (p *PSQL, err error) {
 	p = &PSQL{
-		postgresCngPath: "/home/ilia/Desktop/temki/gonya/UrlCut/configs/postgres.json",
+		postgresCngPath: "/home/ilia/Desktop/UrlCut/configs/postgres.json",
 		cacheSize:       1000,
 	}
 	for _, opt := range opts {
@@ -40,7 +39,6 @@ func NewPSQL(opts ...PSQLOption) (p *PSQL, err error) {
 
 	p.db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
-		log.Fatalln("Не удалось установить соединение с БД Postgres", err.Error())
 		return nil, err
 	}
 
