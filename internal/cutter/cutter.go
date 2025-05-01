@@ -3,6 +3,7 @@ package cutter
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 )
 
 type Cutter struct {
@@ -10,6 +11,10 @@ type Cutter struct {
 }
 
 func NewCutter(cutSize int) (c *Cutter, err error) {
+	if cutSize <= 0 {
+		err = fmt.Errorf("Неверный размер кэша")
+		return
+	}
 	c = &Cutter{
 		cutSize: cutSize,
 	}

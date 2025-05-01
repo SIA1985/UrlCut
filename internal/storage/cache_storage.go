@@ -5,22 +5,21 @@ import (
 	"errors"
 )
 
-
 /*Сохранение недавних ссылок для более быстрого доступа*/
 
 type CacheElement struct {
-	cutUrl 		string
-	fullUrl		string
+	cutUrl  string
+	fullUrl string
 }
 
 type Cache struct {
-	data 		*list.List
-	maxSize		int
+	data    *list.List
+	maxSize int
 }
 
 func NewCache(maxSize int) (c *Cache) {
 	c = &Cache{}
-	
+
 	c.maxSize = maxSize
 	c.data = list.New()
 	return c
@@ -34,10 +33,10 @@ func (c *Cache) Add(cutUrl string, fullUrl string) {
 	c.data.PushBack(CacheElement{cutUrl, fullUrl})
 }
 
-func (c *Cache) Contains(cutUrl string) (bool) {
+func (c *Cache) Contains(cutUrl string) bool {
 	for e := c.data.Front(); e != nil; e = e.Next() {
 		ce := e.Value.(CacheElement)
-		
+
 		if ce.cutUrl == cutUrl {
 			return true
 		}
@@ -49,7 +48,7 @@ func (c *Cache) Contains(cutUrl string) (bool) {
 func (c *Cache) Get(cutUrl string) (string, error) {
 	for e := c.data.Front(); e != nil; e = e.Next() {
 		ce := e.Value.(CacheElement)
-		
+
 		if ce.cutUrl == cutUrl {
 			return ce.fullUrl, nil
 		}
