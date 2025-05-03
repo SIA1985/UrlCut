@@ -35,6 +35,9 @@ type LogicOption func(*Logic)
 
 func WithStorage(storage interfaces.Storage) LogicOption {
 	return func(l *Logic) {
+		if l.storage != nil {
+			l.storage.Close()
+		}
 		l.storage = storage
 	}
 }
@@ -53,7 +56,7 @@ func WithRedirectFunc(redirectFunc func(fullUrl string) (err error)) LogicOption
 
 func NewLogic(opts ...LogicOption) (l *Logic, err error) {
 	var p *storage.PSQL
-	p, err = storage.NewPSQL()
+	p, err = storage.NewPSQL() //todo: 2 раз открывается подключение
 	if err != nil {
 		return
 	}
