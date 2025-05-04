@@ -15,6 +15,8 @@ func NewHTTP(logic *logic.Logic) (h *HTTP, err error) {
 		logic: logic,
 	}
 
+	h.init()
+
 	return
 }
 

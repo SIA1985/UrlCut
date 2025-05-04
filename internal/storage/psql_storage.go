@@ -64,6 +64,10 @@ func (p *PSQL) GetFullUrl(cutUrl string) (fullUrl string, err error) {
 		}
 	}
 
+	if len(fullUrl) == 0 {
+		return
+	}
+
 	p.cache.Add(cutUrl, fullUrl)
 
 	return
