@@ -4,10 +4,12 @@ import (
 	"UrlCut/internal/logic"
 	"fmt"
 	"net/http"
+	"sync"
 )
 
 type HTTP struct {
 	logic *logic.Logic
+	mutex sync.Mutex
 }
 
 func (h *HTTP) Listen() {
@@ -25,7 +27,11 @@ func (h *HTTP) init() {
 		}
 
 		var cutUrl string
+
+		h.mutex.Lock()
 		cutUrl, err = h.logic.CutUrl(fullUrl)
+		h.mutex.Unlock()
+
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -43,7 +49,10 @@ func (h *HTTP) init() {
 			return
 		}
 
+		h.mutex.Lock()
 		err = h.logic.Redirect(cutUrl)
+		h.mutex.Unlock()
+
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
