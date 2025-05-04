@@ -65,6 +65,7 @@ func (p *PSQL) GetFullUrl(cutUrl string) (fullUrl string, err error) {
 	}
 
 	if len(fullUrl) == 0 {
+		err = fmt.Errorf("Элемент по ключу '" + cutUrl + "' не найден")
 		return
 	}
 

@@ -54,5 +54,5 @@ func (c *Cache) Get(cutUrl string) (string, error) {
 		}
 	}
 
-	return "", errors.New("Элемент по ключу '" + cutUrl + "' не найден!")
+	return "", errors.New("Элемент по ключу '" + cutUrl + "' не найден")
 }

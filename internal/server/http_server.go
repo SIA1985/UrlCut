@@ -16,8 +16,8 @@ func (h *HTTP) Listen() {
 	http.ListenAndServe("localhost:8090", nil)
 }
 
-func (h *HTTP) init() {
-	http.HandleFunc("/cut/{fullUrl}", func(w http.ResponseWriter, r *http.Request) {
+func (h *HTTP) createRoutes() {
+	http.HandleFunc("/cut/{fullUrl...}", func(w http.ResponseWriter, r *http.Request) {
 		var err error
 
 		fullUrl := r.PathValue("fullUrl")
@@ -37,10 +37,10 @@ func (h *HTTP) init() {
 			return
 		}
 
-		fmt.Fprint(w, cutUrl)
+		fmt.Fprint(w, cutUrl) //todo: добавить в начало localhost:8090
 	})
 
-	http.HandleFunc("/redirect/{cutUrl}", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/{cutUrl}", func(w http.ResponseWriter, r *http.Request) {
 		var err error
 
 		cutUrl := r.PathValue("cutUrl")
