@@ -54,7 +54,7 @@ func main() {
 		log.Fatalf("Ошибка в создании объекта storage: %v", err)
 		return
 	}
-	tryStorage(p)
+	// tryStorage(p)
 
 	var c *cutter.Cutter
 	c, err = cutter.NewCutter(6)
@@ -62,7 +62,7 @@ func main() {
 		log.Fatalf("Ошибка в создании объекта cutter: %v", err)
 		return
 	}
-	tryCutter(c)
+	// tryCutter(c)
 
 	var l *logic.Logic
 	l, err = logic.NewLogic(logic.WithStorage(p),
@@ -71,10 +71,10 @@ func main() {
 		log.Fatalf("Ошибка в создании объекта logic: %v", err)
 		return
 	}
-	tryLogic(l)
+	// tryLogic(l)
 
 	var s interfaces.Server
-	s, err = server.NewHTTP(l)
+	s, err = server.NewHTTP(l, "localhost:8090")
 	if err != nil {
 		log.Fatalf("Ошибка в создании объекта server: %v", err)
 		return

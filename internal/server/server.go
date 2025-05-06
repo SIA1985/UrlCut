@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func NewHTTP(logic *logic.Logic) (h *HTTP, err error) {
+func NewHTTP(logic *logic.Logic, addr string) (h *HTTP, err error) {
 	if logic == nil {
 		err = fmt.Errorf("logic == nil")
 		return
@@ -13,6 +13,7 @@ func NewHTTP(logic *logic.Logic) (h *HTTP, err error) {
 
 	h = &HTTP{
 		logic: logic,
+		addr:  addr,
 	}
 
 	h.createRoutes()

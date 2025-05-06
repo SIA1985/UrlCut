@@ -10,10 +10,12 @@ import (
 type HTTP struct {
 	logic *logic.Logic
 	mutex sync.Mutex
+
+	addr string
 }
 
 func (h *HTTP) Listen() {
-	http.ListenAndServe("localhost:8090", nil)
+	http.ListenAndServe(h.addr, nil)
 }
 
 func (h *HTTP) createRoutes() {
@@ -37,7 +39,7 @@ func (h *HTTP) createRoutes() {
 			return
 		}
 
-		fmt.Fprint(w, cutUrl) //todo: добавить в начало localhost:8090
+		fmt.Fprint(w, h.addr+"/"+cutUrl)
 	})
 
 	http.HandleFunc("/{cutUrl}", func(w http.ResponseWriter, r *http.Request) {
