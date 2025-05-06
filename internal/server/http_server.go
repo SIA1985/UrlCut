@@ -51,13 +51,17 @@ func (h *HTTP) createRoutes() {
 			return
 		}
 
+		var fullUrl string
+
 		h.mutex.Lock()
-		err = h.logic.Redirect(cutUrl)
+		fullUrl, err = h.logic.GetFullUrl(cutUrl)
 		h.mutex.Unlock()
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		http.Redirect(w, r, fullUrl, http.StatusSeeOther)
 	})
 }

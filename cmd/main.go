@@ -32,12 +32,15 @@ func tryLogic(l *logic.Logic) {
 		return
 	}
 
-	err = l.Redirect(cutUrl)
+	var fullUrl string
+	fullUrl, err = l.GetFullUrl(cutUrl)
 	if err != nil {
 		return
 	}
 
-	fmt.Println("Logic ok")
+	if fullUrl == "www.yandex.ru" {
+		fmt.Println("Logic ok")
+	}
 }
 
 func tryCutter(c *cutter.Cutter) {

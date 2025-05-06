@@ -27,8 +27,6 @@ func openBrowser(fullUrl string) (err error) {
 type Logic struct {
 	storage interfaces.Storage
 	cutter  *cutter.Cutter
-
-	redirectFunc func(fullUrl string) (err error)
 }
 
 type LogicOption func(*Logic)
@@ -48,12 +46,6 @@ func WithCutter(cutter *cutter.Cutter) LogicOption {
 	}
 }
 
-func WithRedirectFunc(redirectFunc func(fullUrl string) (err error)) LogicOption {
-	return func(l *Logic) {
-		l.redirectFunc = redirectFunc
-	}
-}
-
 func NewLogic(opts ...LogicOption) (l *Logic, err error) {
 	var p *storage.PSQL
 	p, err = storage.NewPSQL() //todo: 2 раз открывается подключение
@@ -70,8 +62,6 @@ func NewLogic(opts ...LogicOption) (l *Logic, err error) {
 	l = &Logic{
 		storage: p,
 		cutter:  c,
-
-		redirectFunc: openBrowser,
 	}
 
 	for _, opt := range opts {
@@ -92,17 +82,7 @@ func (l *Logic) CutUrl(fullUrl string) (cutUrl string, err error) {
 	return
 }
 
-func (l *Logic) Redirect(cutUrl string) (err error) {
-	var fullUrl string
+func (l *Logic) GetFullUrl(cutUrl string) (fullUrl string, err error) {
 	fullUrl, err = l.storage.GetFullUrl(cutUrl)
-	if err != nil {
-		return
-	}
-
-	err = l.redirectFunc(fullUrl)
-	if err != nil {
-		return
-	}
-
 	return
 }
