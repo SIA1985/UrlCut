@@ -4,25 +4,7 @@ import (
 	"UrlCut/internal/cutter"
 	"UrlCut/internal/interfaces"
 	"UrlCut/internal/storage"
-	"fmt"
-	"os/exec"
-	"runtime"
 )
-
-func openBrowser(fullUrl string) (err error) {
-	switch os := runtime.GOOS; os {
-	case "linux":
-		err = exec.Command("x-www-browser", fullUrl).Start()
-	case "windows":
-		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", fullUrl).Start()
-	case "darwin":
-		err = exec.Command("open", fullUrl).Start()
-	default:
-		err = fmt.Errorf("Не поддерживаемая платформа!")
-	}
-
-	return
-}
 
 type Logic struct {
 	storage interfaces.Storage

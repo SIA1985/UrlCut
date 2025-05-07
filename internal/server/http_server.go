@@ -15,6 +15,7 @@ type HTTP struct {
 }
 
 func (h *HTTP) Listen() {
+	//todo: Context
 	http.ListenAndServe(h.addr, nil)
 }
 

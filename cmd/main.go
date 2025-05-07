@@ -77,7 +77,7 @@ func main() {
 	// tryLogic(l)
 
 	var s interfaces.Server
-	s, err = server.NewHTTP(l, "localhost:8090")
+	s, err = server.NewTerminal(l)
 	if err != nil {
 		log.Fatalf("Ошибка в создании объекта server: %v", err)
 		return
