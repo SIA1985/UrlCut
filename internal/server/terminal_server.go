@@ -4,6 +4,7 @@ import (
 	"UrlCut/internal/logic"
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"regexp"
@@ -31,35 +32,23 @@ type Terminal struct {
 
 func (h *Terminal) Listen() {
 	//todo: Context
-	var err error
+	cutCmd := regexp.MustCompile(`cut\s\s*[A-Za-z0-9:\/.]*`)
 
-	var cutCmd *regexp.Regexp
-	cutCmd, err = regexp.Compile(`cut [A-Za-z0-9:/.]*`)
-	if err != nil {
-		//todo: err
-		return
-	}
-
-	var redirectCmd *regexp.Regexp
-	redirectCmd, err = regexp.Compile(`redirect [A-Za-z0-9]*`)
-	if err != nil {
-		//todo: err
-		return
-	}
+	redirectCmd := regexp.MustCompile(`redirect\s\s*[A-Za-z0-9]*`)
 
 	sc := bufio.NewScanner(os.Stdin)
 	for sc.Scan() {
 		if cutCmd.MatchString(sc.Text()) {
-			fmt.Println("cut")
+
 			continue
 		}
 
 		if redirectCmd.MatchString(sc.Text()) {
-			fmt.Println("redirect")
+
 			continue
 		}
 
-		fmt.Println("Неизвестная комманда: " + sc.Text())
+		log.Println("Неизвестная комманда: " + sc.Text())
 
 	}
 }
