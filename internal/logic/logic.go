@@ -54,7 +54,10 @@ func NewLogic(opts ...LogicOption) (l *Logic, err error) {
 }
 
 func (l *Logic) CutUrl(fullUrl string) (cutUrl string, err error) {
-	cutUrl = l.cutter.Cut(fullUrl)
+	cutUrl, err = l.cutter.Cut(fullUrl)
+	if err != nil {
+		return
+	}
 
 	err = l.storage.StoreCutUrl(cutUrl, fullUrl)
 	if err != nil {

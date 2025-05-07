@@ -22,7 +22,12 @@ func NewCutter(cutSize int) (c *Cutter, err error) {
 	return
 }
 
-func (c *Cutter) Cut(fullUrl string) (cutUrl string) {
+func (c *Cutter) Cut(fullUrl string) (cutUrl string, err error) {
+	if len(fullUrl) == 0 {
+		err = fmt.Errorf("пустой url для сокращения")
+		return
+	}
+
 	h := md5.New()
 	h.Write([]byte(fullUrl))
 

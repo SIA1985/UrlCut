@@ -44,7 +44,12 @@ func tryLogic(l *logic.Logic) {
 }
 
 func tryCutter(c *cutter.Cutter) {
-	fmt.Println("CutterOk: " + c.Cut("www.yandex.ru"))
+	cutUrl, err := c.Cut("www.yandex.ru")
+	if err != nil {
+		return
+	}
+
+	fmt.Println("CutterOk: " + cutUrl)
 }
 
 func main() {
