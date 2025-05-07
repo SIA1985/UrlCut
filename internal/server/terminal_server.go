@@ -20,7 +20,7 @@ func openBrowser(fullUrl string) (err error) {
 	case "darwin":
 		err = exec.Command("open", fullUrl).Start()
 	default:
-		err = fmt.Errorf("Не поддерживаемая платформа!")
+		err = fmt.Errorf("не поддерживаемая платформа")
 	}
 
 	return
@@ -77,7 +77,7 @@ func (h *Terminal) Listen() {
 			continue
 		}
 
-		log.Println("Неизвестная комманда: " + cmdTxt)
+		log.Println("Неизвестная комманда: '" + cmdTxt + "'")
 
 	}
 }
