@@ -57,7 +57,6 @@ func (p *PSQL) GetFullUrl(cutUrl string) (fullUrl string, err error) {
 	}
 	defer rows.Close()
 
-	/*todo: если более 1, то коллизия*/
 	for rows.Next() {
 		if err = rows.Scan(&fullUrl); err != nil {
 			return
@@ -75,11 +74,23 @@ func (p *PSQL) GetFullUrl(cutUrl string) (fullUrl string, err error) {
 }
 
 func (p *PSQL) StoreCutUrl(cutUrl string, fullUrl string) (err error) {
-	request := fmt.Sprintf("INSERT INTO \"CutToFull\" (cutUrl, fullUrl) VALUES ('%s', '%s')", cutUrl, fullUrl)
+	var tx *sql.Tx
+	tx, err = p.db.Begin()
+	if err != nil {
+		return
+	}
+	defer tx.Rollback()
+
+	//атомарно, но пусть с транзакцией для общего развития
+	request := fmt.Sprintf(`	INSERT INTO "CutToFull" (cutUrl, fullUrl) VALUES ('%s', '%s') 
+											ON CONFLICT (cutUrl) DO UPDATE  SET cutUrl = '%s', fullUrl = '%s'`,
+		cutUrl, fullUrl, cutUrl, fullUrl)
 	_, err = p.db.Query(request)
 	if err != nil {
 		return
 	}
+
+	tx.Commit()
 
 	p.cache.Add(cutUrl, fullUrl)
 
