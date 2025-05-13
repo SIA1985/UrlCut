@@ -3,6 +3,7 @@ package server
 import (
 	"UrlCut/internal/logic"
 	"fmt"
+	"net/http"
 )
 
 func NewHTTP(logic *logic.Logic, addr string) (h *HTTP, err error) {
@@ -14,6 +15,7 @@ func NewHTTP(logic *logic.Logic, addr string) (h *HTTP, err error) {
 	h = &HTTP{
 		logic: logic,
 		addr:  addr,
+		mux:   http.NewServeMux(),
 	}
 
 	h.createRoutes()

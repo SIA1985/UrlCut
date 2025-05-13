@@ -3,7 +3,9 @@ package server
 import (
 	"UrlCut/internal/logic"
 	"fmt"
+	"log"
 	"net/http"
+	"net/url"
 	"sync"
 )
 
@@ -12,20 +14,24 @@ type HTTP struct {
 	mutex sync.Mutex
 
 	addr string
+	mux  *http.ServeMux
 }
 
 func (h *HTTP) Listen() {
 	//todo: Context
-	http.ListenAndServe(h.addr, nil)
+	http.ListenAndServe(h.addr, h.mux)
 }
 
 func (h *HTTP) createRoutes() {
-	http.HandleFunc("/cut/{fullUrl...}", func(w http.ResponseWriter, r *http.Request) {
+	h.mux.HandleFunc("/cut/{fullUrl...}", func(w http.ResponseWriter, r *http.Request) {
 		var err error
 
 		fullUrl := r.PathValue("fullUrl")
-		if len(fullUrl) == 0 {
+
+		_, err = url.ParseRequestURI(fullUrl)
+		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
+			log.Println(err)
 			return
 		}
 
@@ -37,13 +43,14 @@ func (h *HTTP) createRoutes() {
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			log.Println(err)
 			return
 		}
 
 		fmt.Fprint(w, h.addr+"/"+cutUrl)
 	})
 
-	http.HandleFunc("/{cutUrl}", func(w http.ResponseWriter, r *http.Request) {
+	h.mux.HandleFunc("/{cutUrl}", func(w http.ResponseWriter, r *http.Request) {
 		var err error
 
 		cutUrl := r.PathValue("cutUrl")
@@ -60,6 +67,7 @@ func (h *HTTP) createRoutes() {
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			log.Println(err)
 			return
 		}
 

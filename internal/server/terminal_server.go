@@ -2,29 +2,13 @@ package server
 
 import (
 	"UrlCut/internal/logic"
+	"UrlCut/internal/webbrowser"
 	"bufio"
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"regexp"
-	"runtime"
 )
-
-func openBrowser(fullUrl string) (err error) {
-	switch os := runtime.GOOS; os {
-	case "linux":
-		err = exec.Command("x-www-browser", fullUrl).Start()
-	case "windows":
-		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", fullUrl).Start()
-	case "darwin":
-		err = exec.Command("open", fullUrl).Start()
-	default:
-		err = fmt.Errorf("не поддерживаемая платформа")
-	}
-
-	return
-}
 
 type Terminal struct {
 	logic *logic.Logic
@@ -68,11 +52,7 @@ func (h *Terminal) Listen() {
 				continue
 			}
 
-			err = openBrowser(fullUrl)
-			if err != nil {
-				log.Println(err)
-				continue
-			}
+			webbrowser.Open(fullUrl)
 
 			continue
 		}
