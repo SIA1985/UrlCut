@@ -39,7 +39,7 @@ func (h *HTTP) createRoutes() {
 		var cutUrl string
 
 		h.mutex.Lock()
-		cutUrl, err = h.logic.CutUrl(fullUrl)
+		cutUrl, err = h.logic.CutUrl(srvCtx, fullUrl)
 		h.mutex.Unlock()
 
 		if err != nil {
@@ -72,7 +72,7 @@ func (h *HTTP) createRoutes() {
 		var fullUrl string
 
 		h.mutex.Lock()
-		fullUrl, err = h.logic.GetFullUrl(cutUrl)
+		fullUrl, err = h.logic.GetFullUrl(srvCtx, cutUrl)
 		h.mutex.Unlock()
 
 		if err != nil {

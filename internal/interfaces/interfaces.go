@@ -1,9 +1,11 @@
 package interfaces
 
+import "context"
+
 /*Запись и чтение из хранилища*/
 type Storage interface {
-	GetFullUrl(cutUrl string) (fullUrl string, err error)
-	StoreCutUrl(cutUrl string, fullUrl string) (err error)
+	GetFullUrl(ctx context.Context, cutUrl string) (fullUrl string, err error)
+	StoreCutUrl(ctx context.Context, cutUrl string, fullUrl string) (err error)
 	Close()
 }
 

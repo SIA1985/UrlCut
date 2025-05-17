@@ -4,6 +4,7 @@ import (
 	"UrlCut/internal/cutter"
 	"UrlCut/internal/interfaces"
 	"UrlCut/internal/storage"
+	"context"
 	"net/url"
 )
 
@@ -54,7 +55,7 @@ func NewLogic(opts ...LogicOption) (l *Logic, err error) {
 	return
 }
 
-func (l *Logic) CutUrl(fullUrl string) (cutUrl string, err error) {
+func (l *Logic) CutUrl(ctx context.Context, fullUrl string) (cutUrl string, err error) {
 	_, err = url.ParseRequestURI(fullUrl)
 	if err != nil {
 		return
@@ -65,7 +66,8 @@ func (l *Logic) CutUrl(fullUrl string) (cutUrl string, err error) {
 		return
 	}
 
-	err = l.storage.StoreCutUrl(cutUrl, fullUrl)
+	strCtx, _ := context.WithCancel(ctx)
+	err = l.storage.StoreCutUrl(strCtx, cutUrl, fullUrl)
 	if err != nil {
 		return
 	}
@@ -73,7 +75,8 @@ func (l *Logic) CutUrl(fullUrl string) (cutUrl string, err error) {
 	return
 }
 
-func (l *Logic) GetFullUrl(cutUrl string) (fullUrl string, err error) {
-	fullUrl, err = l.storage.GetFullUrl(cutUrl)
+func (l *Logic) GetFullUrl(ctx context.Context, cutUrl string) (fullUrl string, err error) {
+	strCtx, _ := context.WithCancel(ctx)
+	fullUrl, err = l.storage.GetFullUrl(strCtx, cutUrl)
 	return
 }

@@ -12,50 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-
-	"fmt"
 )
-
-func tryStorage(s interfaces.Storage) {
-	url, _ := s.GetFullUrl("aaaaaa")
-	url2, _ := s.GetFullUrl("aaaaaa")
-
-	if url == url2 && len(url) != 0 {
-		fmt.Println("Storage ok")
-		return
-	}
-
-	s.Close()
-}
-
-func tryLogic(l *logic.Logic) {
-	var err error
-
-	var cutUrl string
-	cutUrl, err = l.CutUrl("www.yandex.ru")
-	if err != nil {
-		return
-	}
-
-	var fullUrl string
-	fullUrl, err = l.GetFullUrl(cutUrl)
-	if err != nil {
-		return
-	}
-
-	if fullUrl == "www.yandex.ru" {
-		fmt.Println("Logic ok")
-	}
-}
-
-func tryCutter(c *cutter.Cutter) {
-	cutUrl, err := c.Cut("www.yandex.ru")
-	if err != nil {
-		return
-	}
-
-	fmt.Println("CutterOk: " + cutUrl)
-}
 
 func main() {
 	var err error
@@ -80,7 +37,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Ошибка в создании объекта storage: %v", err)
 	}
-	// tryStorage(p)
 
 	var c *cutter.Cutter
 	c, err = cutter.NewCutter(*cutUrlLen)
@@ -88,7 +44,6 @@ func main() {
 		log.Fatalf("Ошибка в создании объекта cutter: %v", err)
 		return
 	}
-	// tryCutter(c)
 
 	var l *logic.Logic
 	l, err = logic.NewLogic(logic.WithStorage(p),
@@ -97,7 +52,6 @@ func main() {
 		log.Fatalf("Ошибка в создании объекта logic: %v", err)
 		return
 	}
-	// tryLogic(l)
 
 	var s interfaces.Server
 	switch *mode {

@@ -39,7 +39,7 @@ func (h *Terminal) Listen() {
 			fullUrl := url.FindStringSubmatch(cmdTxt)[2]
 
 			var cutUrl string
-			cutUrl, err = h.logic.CutUrl(fullUrl)
+			cutUrl, err = h.logic.CutUrl(srvCtx, fullUrl)
 			if err != nil {
 				log.Println(err)
 				continue
@@ -54,7 +54,7 @@ func (h *Terminal) Listen() {
 			cutUrl := url.FindStringSubmatch(cmdTxt)[2]
 
 			var fullUrl string
-			fullUrl, err = h.logic.GetFullUrl(cutUrl)
+			fullUrl, err = h.logic.GetFullUrl(srvCtx, cutUrl)
 			if err != nil {
 				log.Println(err)
 				continue
