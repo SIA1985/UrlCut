@@ -4,6 +4,7 @@ import (
 	"UrlCut/internal/cutter"
 	"UrlCut/internal/interfaces"
 	"UrlCut/internal/storage"
+	"net/url"
 )
 
 type Logic struct {
@@ -54,6 +55,11 @@ func NewLogic(opts ...LogicOption) (l *Logic, err error) {
 }
 
 func (l *Logic) CutUrl(fullUrl string) (cutUrl string, err error) {
+	_, err = url.ParseRequestURI(fullUrl)
+	if err != nil {
+		return
+	}
+
 	cutUrl, err = l.cutter.Cut(fullUrl)
 	if err != nil {
 		return

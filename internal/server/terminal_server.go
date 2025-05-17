@@ -26,6 +26,14 @@ func (h *Terminal) Listen() {
 
 	sc := bufio.NewScanner(os.Stdin)
 	for sc.Scan() {
+
+		select {
+		case <-srvCtx.Done():
+			return
+		default:
+
+		}
+
 		cmdTxt := sc.Text()
 		if cutCmd.MatchString(cmdTxt) {
 			fullUrl := url.FindStringSubmatch(cmdTxt)[2]

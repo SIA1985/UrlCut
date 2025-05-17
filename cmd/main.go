@@ -6,8 +6,12 @@ import (
 	"UrlCut/internal/logic"
 	"UrlCut/internal/server"
 	"UrlCut/internal/storage"
+	"context"
 	"flag"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"fmt"
 )
@@ -109,5 +113,14 @@ func main() {
 		return
 	}
 
-	s.Listen()
+	ctx, cancel := context.WithCancel(context.Background())
+	server.SetContext(ctx)
+
+	go s.Listen()
+
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	<-sig
+
+	cancel()
 }

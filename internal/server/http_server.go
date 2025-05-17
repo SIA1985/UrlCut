@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"sync"
 )
 
@@ -15,25 +14,27 @@ type HTTP struct {
 
 	addr string
 	mux  *http.ServeMux
+	srv  *http.Server
 }
 
 func (h *HTTP) Listen() {
-	//todo: Context
-	http.ListenAndServe(h.addr, h.mux)
+	h.srv.ListenAndServe()
 }
 
 func (h *HTTP) createRoutes() {
 	h.mux.HandleFunc("/cut/{fullUrl...}", func(w http.ResponseWriter, r *http.Request) {
 		var err error
 
-		fullUrl := r.PathValue("fullUrl")
-
-		_, err = url.ParseRequestURI(fullUrl)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			log.Println(err)
+		select {
+		case <-srvCtx.Done():
+			w.WriteHeader(http.StatusNotExtended)
 			return
+		case <-r.Context().Done():
+			return
+		default:
 		}
+
+		fullUrl := r.PathValue("fullUrl")
 
 		var cutUrl string
 
@@ -52,6 +53,15 @@ func (h *HTTP) createRoutes() {
 
 	h.mux.HandleFunc("/{cutUrl}", func(w http.ResponseWriter, r *http.Request) {
 		var err error
+
+		select {
+		case <-srvCtx.Done():
+			w.WriteHeader(http.StatusNotExtended)
+			return
+		case <-r.Context().Done():
+			return
+		default:
+		}
 
 		cutUrl := r.PathValue("cutUrl")
 		if len(cutUrl) == 0 {

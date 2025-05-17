@@ -2,9 +2,16 @@ package server
 
 import (
 	"UrlCut/internal/logic"
+	"context"
 	"fmt"
 	"net/http"
 )
+
+var srvCtx context.Context
+
+func SetContext(ctx context.Context) {
+	srvCtx = ctx
+}
 
 func NewHTTP(logic *logic.Logic, addr string) (h *HTTP, err error) {
 	if logic == nil {
@@ -19,6 +26,11 @@ func NewHTTP(logic *logic.Logic, addr string) (h *HTTP, err error) {
 	}
 
 	h.createRoutes()
+
+	h.srv = &http.Server{
+		Addr:    addr,
+		Handler: h.mux,
+	}
 
 	return
 }
