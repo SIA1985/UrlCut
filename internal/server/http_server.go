@@ -81,6 +81,6 @@ func (h *HTTP) createRoutes() {
 			return
 		}
 
-		http.Redirect(w, r, fullUrl, http.StatusSeeOther)
+		http.Redirect(w, r, fullUrl, http.StatusFound)
 	})
 }
